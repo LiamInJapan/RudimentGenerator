@@ -3,11 +3,12 @@
 # Get some basic rudiment patterns in
 # Work out how to reverse rudiments
 # Get all rudiment patterns in
-# work out how to do flam
-# work out how to do buzz roll
+# work out how to do flam roll
+# work out how to do buzz roll notes
 # work out how to pipe into game front end
 # interface with real snare pad
 # get outputted sound running through timidity with drum sounds
+# Design some simple markup to reduce code complexity  (e.g. LRLRLRLR -> single stroke LfRLLRfLRR -> paradiddle flam)
 
 import midi
 import argparse
@@ -57,6 +58,7 @@ class RudimentGenerator:
 	def single_stroke_roll(self):
 
 		for beat in range(0,4):
+
 			on = midi.NoteOnEvent(tick=self.rest, velocity=120, pitch=self.sticking[self.left_stick])
 			self.track.append(on)
 			next_beat = self.one_beat_value/self.beat_values_new["1/4"][1]
@@ -67,7 +69,9 @@ class RudimentGenerator:
 	def single_stroke_four(self):
 
 		for beat in range(0,6):
+
 			if(beat < 4):
+
 				on = midi.NoteOnEvent(tick=self.rest, velocity=120, pitch=self.sticking[self.left_stick])
 				self.track.append(on)
 				self.rest = 0
@@ -76,7 +80,9 @@ class RudimentGenerator:
 				self.track.append(off)
 				self.left_stick = not self.left_stick
 				self.offset = 0
+
 			else:
+
 				self.rest += self.one_beat_value/self.beat_values_new["1/6"][1]
 
 		#self.offset = self.beat_values["1/4"]
@@ -85,12 +91,198 @@ class RudimentGenerator:
 
 		print "Unimplemented Rudiment"
 
+	paradiddle = (1,1,2) # index into this with start_index below to get different variations
+
+	def single_paradiddle(self, start_index):
+
+		for beat in range(0,4):
+
+			pass # TODO Implelement
 	
+	def multiple_bounce_roll(self):
+
+		print "Unimplemented Rudiment"
+
+	def double_stroke_roll(self):
+
+		print "Unimplemented Rudiment"
+
+	def triple_stroke_roll(self):
+
+		print "Unimplemented Rudiment"
+
+	def five_stroke_roll(self):
+
+		print "Unimplemented Rudiment"
+
+	def six_stroke_roll(self):
+
+		print "Unimplemented Rudiment"
+
+	def seven_stroke_roll(self):
+
+		print "Unimplemented Rudiment"
+
+	def nine_stroke_roll(self):
+
+		print "Unimplemented Rudiment"
+
+	def ten_stroke_roll(self):
+
+		print "Unimplemented Rudiment"
+
+	def eleven_stroke_roll(self):
+
+		print "Unimplemented Rudiment"
+
+	def thirteen_stroke_roll(self):
+
+		print "Unimplemented Rudiment"
+
+	def fifteen_stroke_roll(self):
+
+		print "Unimplemented Rudiment"
+
+	def seventeen_stroke_roll(self):
+
+		print "Unimplemented Rudiment"
+
+	def single_paradiddle(self):
+
+		print "Unimplemented Rudiment"
+
+	def double_paradiddle(self):
+
+		print "Unimplemented Rudiment"
+
+	def triple_paradiddle(self):
+
+		print "Unimplemented Rudiment"
+
+	def single_paradiddle_diddle(self):
+
+		print "Unimplemented Rudiment"
+
+	def flam(self):
+
+		print "Unimplemented Rudiment"
+
+	def flam_tap(self):
+
+		print "Unimplemented Rudiment"
+
+	def flam_accent(self):
+
+		print "Unimplemented Rudiment"
+
+	def flamacue(self):
+
+		print "Unimplemented Rudiment"
+
+	def flam_paradiddle(self):
+
+		print "Unimplemented Rudiment"
+
+	def single_flammed_mill(self):
+
+		print "Unimplemented Rudiment"
+
+	def flam_paradiddle_diddle(self):
+
+		print "Unimplemented Rudiment"
+
+	def swiss_army_triplet(self):
+
+		print "Unimplemented Rudiment"
+
+	def inverted_flam_tap(self):
+
+		print "Unimplemented Rudiment"
+
+	def flam_drag(self):
+
+		print "Unimplemented Rudiment"
+
+	def pataflafla(self):
+
+		print "Unimplemented Rudiment"
+
+	def drag_ruff(self):
+
+		print "Unimplemented Rudiment"
+
+	def single_drag_tap(self):
+
+		print "Unimplemented Rudiment"
+
+	def double_drag_tap(self):
+
+		print "Unimplemented Rudiment"
+
+	def single_dragadiddle(self):
+
+		print "Unimplemented Rudiment"
+
+	def dragadiddle_1(self):
+
+		print "Unimplemented Rudiment"
+
+	def dragadiddle_2(self):
+
+		print "Unimplemented Rudiment"
+
+	def single_ratamacue(self):
+
+		print "Unimplemented Rudiment"
+
+	def double_ratamacue(self):
+
+		print "Unimplemented Rudiment"
+
+	def triple_ratamacue(self):
+
+		print "Unimplemented Rudiment"
 
 	rudiments = {
-		'single_stroke_roll': single_stroke_roll,
-	    'single_stroke_four': single_stroke_four,
-	    'single_stroke_seven': single_stroke_seven,	
+		'single_stroke_roll' : single_stroke_roll,
+	    'single_stroke_four' : single_stroke_four,
+	    'single_stroke_seven' : single_stroke_seven,
+	    'multiple_bounce_roll' : multiple_bounce_roll,
+	    'double_stroke_roll' : double_stroke_roll,
+	    'triple_stroke_roll' : triple_stroke_roll,
+	    'five_stroke_roll' : five_stroke_roll,
+	    'six_stroke_roll' : six_stroke_roll,
+	    'seven_stroke_roll' : seven_stroke_roll,
+	    'nine_stroke_roll' : nine_stroke_roll,
+	    'ten_stroke_roll' : ten_stroke_roll,
+	    'eleven_stroke_roll' : eleven_stroke_roll,
+	    'thirteen_stroke_roll' : thirteen_stroke_roll,
+	    'fifteen_stroke_roll' : fifteen_stroke_roll,
+	    'seventeen_stroke_roll' : seventeen_stroke_roll,
+	    'single_paradiddle' : single_paradiddle,
+	    'double_paradiddle' : double_paradiddle,
+	    'triple_paradiddle' : triple_paradiddle,
+	    'single_paradiddle_diddle' : single_paradiddle_diddle,
+	    'flam' : flam,
+	    'flam_tap' : flam_tap,
+	    'flam_accent' : flam_accent,
+	    'flamacue' : flamacue,
+	    'flam_paradiddle' : flam_paradiddle,
+	    'single_flammed_mill' : single_flammed_mill,
+	    'flam_paradiddle_diddle' : flam_paradiddle_diddle,
+	    'swiss_army_triplet' : swiss_army_triplet,
+	    'inverted_flam_tap' : inverted_flam_tap,
+	    'flam_drag' : flam_drag,
+	    'pataflafla' : pataflafla,
+	    'drag_ruff' : drag_ruff,
+	    'single_drag_tap' : single_drag_tap,
+	    'double_drag_tap' : double_drag_tap,
+	    'single_dragadiddle' : single_dragadiddle,
+	    'dragadiddle_1' : dragadiddle_1,
+	    'dragadiddle_2' : dragadiddle_2,
+	    'single_ratamacue' : single_ratamacue,
+	    'double_ratamacue' : double_ratamacue,
+	    'triple_ratamacue' : triple_ratamacue,
 	}
 
 	def __init__(self, bpm):
