@@ -5,6 +5,9 @@
 # Get all rudiment patterns in
 # work out how to do flam
 # work out how to do buzz roll
+# work out how to pipe into game front end
+# interface with real snare pad
+# get outputted sound running through timidity with drum sounds
 
 import midi
 import argparse
@@ -19,6 +22,7 @@ class RudimentGenerator:
 	left_stick = False
 
 	def single_stroke_roll(self):
+
 		for beat in range(0,4):
 			on = midi.NoteOnEvent(tick=0, velocity=120, pitch=self.sticking[self.left_stick])
 			self.track.append(on)
@@ -41,7 +45,7 @@ class RudimentGenerator:
 
 	def single_stroke_seven(self):
 
-		print "LLLLLLL"
+		print "Unimplemented Rudiment"
 
 	
 
