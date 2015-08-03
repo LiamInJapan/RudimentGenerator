@@ -2,10 +2,21 @@
 # Map to left/right drum stickings
 # Get some basic rudiment patterns in
 # Get all rudiment patterns in
-# Have BPM and number of bars as program parameters
+
+# Have BPM and number of bars as program parameters *
+
 # Parameterise filename
 
 import midi
+import argparse
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("bpm", help="the bpm you wish to generate at", type=int)
+parser.add_argument("output", help="the name of the output midi file")
+
+args = parser.parse_args()
+
 # Instantiate a MIDI Pattern (contains a list of tracks)
 pattern = midi.Pattern()
 # Instantiate a MIDI Track (contains a list of MIDI events)
@@ -13,6 +24,10 @@ track = midi.Track()
 # Append the track to the pattern
 pattern.append(track)
 # Instantiate a MIDI note on event, append it to the track
+
+tempo = midi.SetTempoEvent()
+tempo.set_bpm(args.bpm)
+track.append(tempo)
 
 for bar in range(0,4):
 
@@ -28,4 +43,4 @@ track.append(eot)
 # Print out the pattern
 print pattern
 # Save the pattern to disk
-midi.write_midifile("example.mid", pattern)
+midi.write_midifile(args.output, pattern)
