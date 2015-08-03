@@ -1,36 +1,74 @@
 # TODO
 # Map to left/right drum stickings
 # Get some basic rudiment patterns in
+# Work out how to reverse rudiments
 # Get all rudiment patterns in
+# work out how to do flam
+# work out how to do buzz roll
 
 import midi
 import argparse
 
-def single_stroke_roll():
+class RudimentGenerator:
 
-	print "LRLR"
-	pass
-	#on = midi.NoteOnEvent(tick=0, velocity=120, pitch=midi.G_3+bar)
-	#track.append(on)
-	#off = midi.NoteOffEvent(tick=100, pitch=midi.G_3+bar)
-	#track.append(off)
+	sticking = {
+		False : midi.G_3,
+		True : midi.G_3+1,
+	}
 
-def single_stroke_seven():
+	left_stick = False
 
-	print "LLLLLLL"
-	pass
+	def single_stroke_roll(self):
+		for beat in range(0,4):
+			on = midi.NoteOnEvent(tick=0, velocity=120, pitch=self.sticking[self.left_stick])
+			self.track.append(on)
+			off = midi.NoteOffEvent(tick=100, pitch=self.sticking[self.left_stick])
+			self.track.append(off)
+			self.left_stick = not self.left_stick
 
-def single_stroke_four():
+	def single_stroke_seven(self):
 
-	print "LLLL"
-	pass
+		print "LLLLLLL"
+
+	def single_stroke_four(self):
+
+		print "LLLL"
+
+	rudiments = {
+		'single_stroke_roll': single_stroke_roll,
+	    'single_stroke_four': single_stroke_four,
+	    'single_stroke_seven': single_stroke_seven,	
+	}
+
+	def __init__(self, bpm):
+		
+		self.pattern = midi.Pattern()
+		self.track = midi.Track()
+		self.pattern.append(self.track)
 	
-def getRudiment(rudiment):
-    return {
-        'single_stroke_roll': single_stroke_roll(),
-        'single_stroke_four': single_stroke_four(),
-        'single_stroke_seven': single_stroke_seven(),
-    }.get(rudiment) 
+		tempo = midi.SetTempoEvent()
+		tempo.set_bpm(bpm)
+		self.track.append(tempo)
+
+
+	def generateRudiments(self, bars):
+		for bar in range(0,bars):
+			self.rudiments[args.rudiment](self)
+		self.endOfTrack()
+		self.saveTrack()
+
+	def endOfTrack(self):
+		# Add the end of track event, append it to the track
+		eot = midi.EndOfTrackEvent(tick=1)
+		self.track.append(eot)
+		# Print out the pattern
+		print self.pattern
+	
+	def saveTrack(self):
+		# Save the pattern to disk
+		midi.write_midifile(args.output, self.pattern)
+
+
 
 parser = argparse.ArgumentParser()
 
@@ -41,33 +79,9 @@ parser.add_argument("rudiment", help="the name of the rudiment to generate")
 
 args = parser.parse_args()
 
-# Instantiate a MIDI Pattern (contains a list of tracks)
-pattern = midi.Pattern()
-# Instantiate a MIDI Track (contains a list of MIDI events)
-track = midi.Track()
-# Append the track to the pattern
-pattern.append(track)
-# Instantiate a MIDI note on event, append it to the track
+rg = RudimentGenerator(120)
+rg.generateRudiments(args.bars)
 
-tempo = midi.SetTempoEvent()
-tempo.set_bpm(args.bpm)
-track.append(tempo)
 
-for bar in range(0,args.bars):
 
-	getRudiment(args.rudiment)
-
-	#on = midi.NoteOnEvent(tick=0, velocity=120, pitch=midi.G_3+bar)
-	#track.append(on)
-	# Instantiate a MIDI note off event, append it to the track
-	#off = midi.NoteOffEvent(tick=100, pitch=midi.G_3+bar)
-	#track.append(off)
-
-# Add the end of track event, append it to the track
-eot = midi.EndOfTrackEvent(tick=1)
-track.append(eot)
-# Print out the pattern
-print pattern
-# Save the pattern to disk
-midi.write_midifile(args.output, pattern)
 
