@@ -26,13 +26,24 @@ class RudimentGenerator:
 			self.track.append(off)
 			self.left_stick = not self.left_stick
 
+	# TODO: Triplify this
+	def single_stroke_four(self):
+
+		for beat in range(0,4):
+			on = midi.NoteOnEvent(tick=100+self.offset, velocity=120, pitch=self.sticking[self.left_stick])
+			self.track.append(on)
+			off = midi.NoteOffEvent(tick=100, pitch=self.sticking[self.left_stick])
+			self.track.append(off)
+			self.left_stick = not self.left_stick
+			self.offset = 0
+
+		self.offset = 100
+
 	def single_stroke_seven(self):
 
 		print "LLLLLLL"
 
-	def single_stroke_four(self):
-
-		print "LLLL"
+	
 
 	rudiments = {
 		'single_stroke_roll': single_stroke_roll,
@@ -45,7 +56,7 @@ class RudimentGenerator:
 		self.pattern = midi.Pattern()
 		self.track = midi.Track()
 		self.pattern.append(self.track)
-	
+		self.offset = 0
 		tempo = midi.SetTempoEvent()
 		tempo.set_bpm(bpm)
 		self.track.append(tempo)
@@ -77,9 +88,21 @@ parser.add_argument("bars", help="the number of bars of pattern to generate", ty
 parser.add_argument("output", help="the name of the output midi file")
 parser.add_argument("rudiment", help="the name of the rudiment to generate")
 
+parser.add_argument("--reverse_sticking", help="reverse the sticking",
+                    action="store_true")
 args = parser.parse_args()
 
 rg = RudimentGenerator(120)
+
+if args.reverse_sticking:
+	print "reverse sticking"
+	rg.left_stick = not rg.left_stick
+else:
+	print "sticking is normal"
+
+args = parser.parse_args()
+
+
 rg.generateRudiments(args.bars)
 
 
