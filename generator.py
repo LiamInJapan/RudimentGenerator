@@ -10,6 +10,35 @@
 # get outputted sound running through timidity with drum sounds
 # Design some simple markup to reduce code complexity  (e.g. LRLRLRLR -> single stroke LfRLLRfLRR -> paradiddle flam)
 
+
+
+'''
+
+Potential spec for rudiment markup
+
+L - left beat
+R - right beat
+4 - change to 1/4s
+3 - change to triplet time
+Lf - Left-led flam
+Rf - Right-led flam
+Lr - Left roll
+Rr - Right roll
+O - rest
+* int - number of repetitions
+
+So for example 10 repetitions of flam paradiddle would transcribe as:
+
+4 Rf L R R Lf R L L * 10
+
+5 bars of single stroke 7 would be 
+
+3 R L R L R L R O O O O O * 5
+
+And so on
+
+'''
+
 import midi
 import argparse
 
