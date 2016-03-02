@@ -18,3 +18,17 @@ positional arguments:
 
 optional arguments:
   -h, --help          show this help
+
+For example, to create 10 bars of single stroke fours at 60 bpm:
+python generator.py 60 10 example.mid single_stroke_four
+
+You can then play the output file via timidity.
+
+Install: 
+$ brew install timidity
+
+Test with:
+timidity example.mid
+
+
+
