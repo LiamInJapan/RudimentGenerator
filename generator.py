@@ -6,6 +6,7 @@
 # work out how to do flam roll
 # work out how to do buzz roll notes
 # work out how to pipe into game front end
+# work out how to install dependencies  (https://pip.readthedocs.org/en/stable/user_guide/#requirements-files)
 # interface with real snare pad
 # get outputted sound running through timidity with drum sounds
 # Design some simple markup to reduce code complexity  (e.g. LRLRLRLR -> single stroke LfRLLRfLRR -> paradiddle flam)
