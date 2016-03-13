@@ -1,5 +1,12 @@
 # RudimentGenerator
+
 A command line drum MIDI Rudiment Generator for the standard 26 Drum Rudiments.
+
+I was looking to download some MIDI of drum rudiments in order to use them for a music game idea I have.
+Amazingly there didn't seem to be any out there. So I wrote a generator to make them.
+
+This remains unfinished, I can generate a few rudiments with it, but it's not very extendible. 
+The next stage of development is to create a simple domain specific language to describe *any* rudiment.
 
 Pip Install:
 http://python-packaging-user-guide.readthedocs.org/en/latest/installing/
