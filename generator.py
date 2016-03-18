@@ -10,7 +10,7 @@
 # interface with real snare pad
 # get outputted sound running through timidity with drum sounds
 # refactor interface more
-# implement flam
+# fix flam
 # implement rest
 # add difficult factor (for note length)... Should probably also calculate relative to tempo, or at least do some error checking against tempo so no overlaps
 
@@ -22,10 +22,10 @@ L - left beat
 R - right beat
 4 - change to 1/4s
 3 - change to triplet time
-Lf - Left-led flam
-Rf - Right-led flam
-Lr - Left roll
-Rr - Right roll
+fL - Left-led flam
+fR - Right-led flam
+rL - Left roll
+rR - Right roll
 O - rest
 * int - number of repetitions
 
@@ -127,6 +127,7 @@ class RudimentGenerator:
 		print "BPM: %d" % args.bpm
 		self.pattern = midi.Pattern()
 		self.track = midi.Track()
+		self.flam = False;
 		self.pattern.append(self.track)
 		self.note_tightness = args.note_tightness
 		self.rest = self.one_beat_value/self.beat_values_new["1/4"][1]
@@ -134,12 +135,30 @@ class RudimentGenerator:
 		tempo.set_bpm(args.bpm)
 		self.track.append(tempo)
 
-	def write_note(self, note):
+	def write_flam_note(self, note):
 		on = midi.NoteOnEvent(tick = self.rest, velocity=120, pitch = note)
 		self.track.append(on)
 		off = midi.NoteOffEvent(tick = self.rest+self.note_tightness, pitch = note)
 		self.track.append(off)
+
+		on = midi.NoteOnEvent(tick = self.rest+1, velocity=120, pitch = note+2)
+		self.track.append(on)
+		off = midi.NoteOffEvent(tick = self.rest+2, pitch = note+2)
+		self.track.append(off)
+
 		self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
+		self.flam = False
+
+	def write_note(self, note):
+		if self.flam == True:
+			self.write_flam_note(note)
+		else:
+			on = midi.NoteOnEvent(tick = self.rest, velocity=60, pitch = note)
+			self.track.append(on)
+			off = midi.NoteOffEvent(tick = self.rest+self.note_tightness, pitch = note)
+			self.track.append(off)
+			self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
+		
 
 	def left_stick(self):
 		print "left"
@@ -163,6 +182,10 @@ class RudimentGenerator:
 		print "Swap to 3 time"
 		self.timing = 6
 
+	def rest(self):
+		print "rest"
+		self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
+
 	new_sticking = {
 		"l" : midi.G_3,
 		"r" : midi.G_3+1,
@@ -178,7 +201,7 @@ class RudimentGenerator:
 		'R' : right_stick_accent,
 		'4' : four_time,
 		'3' : three_time,
-
+		'O' : rest,
 	}
 
 	def generateMidiFromMarkup(self, rudiment_pattern):
@@ -187,7 +210,12 @@ class RudimentGenerator:
 		self.timing = 4
 
 		for unit in rudiment_pattern:
-			self.rudiparse[unit](self)
+
+			if unit == "f":
+				print "prepare for flam"
+				self.flam = True   # skip this unit, but note for a flam for next one
+			else:
+				self.rudiparse[unit](self)
 
 		self.endOfTrack()
 		self.saveTrack()
