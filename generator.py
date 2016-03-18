@@ -16,7 +16,7 @@
 
 '''
 
-Potential spec for rudiment markup
+Spec for rudiment markup
 
 L - left beat
 R - right beat
@@ -122,8 +122,6 @@ class RudimentGenerator:
 	    'triple_ratamacue' : "llllllll",
 	}
 
-	
-
 	def __init__(self):
 		
 		print "BPM: %d" % args.bpm
@@ -136,37 +134,26 @@ class RudimentGenerator:
 		tempo.set_bpm(args.bpm)
 		self.track.append(tempo)
 
-	def left_stick(self):
-		print "left"
-
-		on = midi.NoteOnEvent(tick = self.rest, velocity=120, pitch = self.new_sticking["l"])
+	def write_note(self, note):
+		on = midi.NoteOnEvent(tick = self.rest, velocity=120, pitch = note)
 		self.track.append(on)
-		off = midi.NoteOffEvent(tick = self.rest+self.note_tightness, pitch = self.new_sticking["l"])
+		off = midi.NoteOffEvent(tick = self.rest+self.note_tightness, pitch = note)
 		self.track.append(off)
 		self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
+
+	def left_stick(self):
+		print "left"
+		self.write_note(self.new_sticking["l"])
 
 	def right_stick(self):
 		print "right - Unimplemented Parser"
-
-		on = midi.NoteOnEvent(tick = self.rest, velocity=120, pitch = self.new_sticking["r"])
-		self.track.append(on)
-		off = midi.NoteOffEvent(tick = self.rest+self.note_tightness, pitch = self.new_sticking["l"])
-		self.track.append(off)
-		self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
+		self.write_note(self.new_sticking["r"])
 
 	def left_stick_accent(self):
-		on = midi.NoteOnEvent(tick = self.rest, velocity=120, pitch = self.new_sticking["L"])
-		self.track.append(on)
-		off = midi.NoteOffEvent(tick = self.rest+self.note_tightness, pitch = self.new_sticking["l"])
-		self.track.append(off)
-		self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
+		self.write_note(self.new_sticking["L"])
 
 	def right_stick_accent(self):
-		on = midi.NoteOnEvent(tick = self.rest, velocity=120, pitch = self.new_sticking["R"])
-		self.track.append(on)
-		off = midi.NoteOffEvent(tick = self.rest+self.note_tightness, pitch = self.new_sticking["l"])
-		self.track.append(off)
-		self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
+		self.write_note(self.new_sticking["R"])
 
 	def four_time(self):
 		print "Swap to 3 time"
