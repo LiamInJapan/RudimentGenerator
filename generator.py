@@ -9,7 +9,10 @@
 # work out how to install dependencies  (https://pip.readthedocs.org/en/stable/user_guide/#requirements-files)
 # interface with real snare pad
 # get outputted sound running through timidity with drum sounds
-# Design some simple markup to reduce code complexity  (e.g. LRLRLRLR -> single stroke LfRLLRfLRR -> paradiddle flam)
+# refactor interface more
+# implement flam
+# implement rest
+# add difficult factor (for note length)... Should probably also calculate relative to tempo, or at least do some error checking against tempo so no overlaps
 
 '''
 
@@ -121,15 +124,16 @@ class RudimentGenerator:
 
 	
 
-	def __init__(self, bpm):
+	def __init__(self):
 		
-		print "BPM: %d" % bpm
+		print "BPM: %d" % args.bpm
 		self.pattern = midi.Pattern()
 		self.track = midi.Track()
 		self.pattern.append(self.track)
+		self.note_tightness = args.note_tightness
 		self.rest = self.one_beat_value/self.beat_values_new["1/4"][1]
 		tempo = midi.SetTempoEvent()
-		tempo.set_bpm(bpm)
+		tempo.set_bpm(args.bpm)
 		self.track.append(tempo)
 
 	def left_stick(self):
@@ -137,32 +141,32 @@ class RudimentGenerator:
 
 		on = midi.NoteOnEvent(tick = self.rest, velocity=120, pitch = self.new_sticking["l"])
 		self.track.append(on)
-		off = midi.NoteOffEvent(tick = self.rest+10, pitch = self.new_sticking["l"])
+		off = midi.NoteOffEvent(tick = self.rest+self.note_tightness, pitch = self.new_sticking["l"])
 		self.track.append(off)
-		self.rest = self.one_beat_value/self.beat_values_new["1/4"][1]
+		self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
 
 	def right_stick(self):
 		print "right - Unimplemented Parser"
 
 		on = midi.NoteOnEvent(tick = self.rest, velocity=120, pitch = self.new_sticking["r"])
 		self.track.append(on)
-		off = midi.NoteOffEvent(tick = self.rest+10, pitch = self.new_sticking["l"])
+		off = midi.NoteOffEvent(tick = self.rest+self.note_tightness, pitch = self.new_sticking["l"])
 		self.track.append(off)
-		self.rest = self.one_beat_value/self.beat_values_new["1/4"][1]
+		self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
 
 	def left_stick_accent(self):
 		on = midi.NoteOnEvent(tick = self.rest, velocity=120, pitch = self.new_sticking["L"])
 		self.track.append(on)
-		off = midi.NoteOffEvent(tick = self.rest+10, pitch = self.new_sticking["l"])
+		off = midi.NoteOffEvent(tick = self.rest+self.note_tightness, pitch = self.new_sticking["l"])
 		self.track.append(off)
-		self.rest = self.one_beat_value/self.beat_values_new["1/4"][1]
+		self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
 
 	def right_stick_accent(self):
 		on = midi.NoteOnEvent(tick = self.rest, velocity=120, pitch = self.new_sticking["R"])
 		self.track.append(on)
-		off = midi.NoteOffEvent(tick = self.rest+10, pitch = self.new_sticking["l"])
+		off = midi.NoteOffEvent(tick = self.rest+self.note_tightness, pitch = self.new_sticking["l"])
 		self.track.append(off)
-		self.rest = self.one_beat_value/self.beat_values_new["1/4"][1]
+		self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
 
 	def four_time(self):
 		print "Swap to 3 time"
@@ -170,7 +174,7 @@ class RudimentGenerator:
 
 	def three_time(self):
 		print "Swap to 3 time"
-		self.timing = 3
+		self.timing = 6
 
 	new_sticking = {
 		"l" : midi.G_3,
@@ -217,17 +221,17 @@ class RudimentGenerator:
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("bpm", help="the bpm you wish to generate at", type=int)
-#parser.add_argument("bars", help="the number of bars of pattern to generate", type=int)
-parser.add_argument("output", help="the name of the output midi file")
-#parser.add_argument("rudiment", help="the name of the rudiment to generate")
 parser.add_argument("rudiment_pattern", help="a rudiment markup pattern to parse")
-
-parser.add_argument("--reverse_sticking", help="reverse the sticking",
+parser.add_argument("bpm", help="the bpm you wish to generate at", type=int)
+parser.add_argument("output", help="the name of the output midi file")
+parser.add_argument("-t", "--note_tightness", help="define the length of the midi notes (should relate to difficulty to hit in FE", type=int, default=10)
+#parser.add_argument("bars", help="the number of bars of pattern to generate", type=int)
+#parser.add_argument("rudiment", help="the name of the rudiment to generate")
+parser.add_argument("-r", "--reverse_sticking", help="reverse the sticking",
                     action="store_true")
 args = parser.parse_args()
 
-rg = RudimentGenerator(args.bpm)
+rg = RudimentGenerator()
 
 if args.reverse_sticking:
 	print "reverse sticking"
@@ -236,8 +240,6 @@ else:
 	print "sticking is normal"
 
 args = parser.parse_args()
-
-
 rg.generateMidiFromMarkup(args.rudiment_pattern)
 
 
