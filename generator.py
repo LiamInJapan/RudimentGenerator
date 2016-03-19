@@ -81,14 +81,15 @@ class RudimentGenerator:
 	}
 
 	rudiments = {
-		'single_stroke_roll' : "llllllll",
-	    'single_stroke_four' : "llllllll",
-	    'single_stroke_seven' : "llllllll",
-	    'multiple_bounce_roll' : "llllllll",
-	    'double_stroke_roll' : "llllllll",
-	    'triple_stroke_roll' : "llllllll",
-	    'five_stroke_roll' : "llllllll",
-	    'six_stroke_roll' : "llllllll",
+		'single_stroke_roll' : "4rlrlrlrl",
+	    'single_stroke_four' : "3rlrloorlrloo",
+	    'single_stroke_seven' : "6rlrlrlrooo",
+	    'multiple_bounce_roll' : "????",   # need to think about how to implement bounces e.t.c. with real pad
+	    'double_stroke_roll' : "4rrllrrll",
+	    'triple_stroke_roll' : "3rrrlllrrrlll",
+	    'five_stroke_roll' : "4rrrrRooollllLooo",
+	    'five_stroke_roll_triplet' : "3rrllrooollrrlooo",
+	    'six_stroke_roll' : "6RrrrrLRrrrrL",
 	    'seven_stroke_roll' : "llllllll",
 	    'nine_stroke_roll' : "llllllll",
 	    'ten_stroke_roll' : "llllllll",
@@ -127,7 +128,8 @@ class RudimentGenerator:
 		print "BPM: %d" % args.bpm
 		self.pattern = midi.Pattern()
 		self.track = midi.Track()
-		self.flam = False;
+		self.flam = False
+		self.rest_beats = 1
 		self.pattern.append(self.track)
 		self.note_tightness = args.note_tightness
 		self.rest = self.one_beat_value/self.beat_values_new["1/4"][1]
@@ -147,17 +149,23 @@ class RudimentGenerator:
 		self.track.append(off)
 
 		self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
+		self.rest *= self.rest_beats
 		self.flam = False
+		self.rest_beats = 1
 
 	def write_note(self, note):
 		if self.flam == True:
 			self.write_flam_note(note)
 		else:
+			print "before - rest: %d rest_beats: %d" % (self.rest, self.rest_beats)
+			self.rest *= self.rest_beats
+			print "after - rest: %d rest_beats: %d" % (self.rest, self.rest_beats)
 			on = midi.NoteOnEvent(tick = self.rest, velocity=60, pitch = note)
 			self.track.append(on)
-			off = midi.NoteOffEvent(tick = self.rest+self.note_tightness, pitch = note)
+			off = midi.NoteOffEvent(tick = self.note_tightness, pitch = note)
 			self.track.append(off)
 			self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
+			self.rest_beats = 1
 		
 
 	def left_stick(self):
@@ -165,26 +173,24 @@ class RudimentGenerator:
 		self.write_note(self.new_sticking["l"])
 
 	def right_stick(self):
-		print "right - Unimplemented Parser"
+		print "right"
 		self.write_note(self.new_sticking["r"])
 
 	def left_stick_accent(self):
+		print "left accent"
 		self.write_note(self.new_sticking["L"])
 
 	def right_stick_accent(self):
+		print "right accent"
 		self.write_note(self.new_sticking["R"])
 
-	def four_time(self):
-		print "Swap to 3 time"
-		self.timing = 4
-
-	def three_time(self):
-		print "Swap to 3 time"
-		self.timing = 6
+	def time(self, new_time):
+		print "Swap to %d time" % new_time
+		self.timing = new_time
 
 	def rest(self):
 		print "rest"
-		self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
+		self.rest_beats += 1
 
 	new_sticking = {
 		"l" : midi.G_3,
@@ -199,29 +205,38 @@ class RudimentGenerator:
 		'r' : right_stick,
 		'L' : left_stick_accent,
 		'R' : right_stick_accent,
-		'4' : four_time,
-		'3' : three_time,
-		'O' : rest,
+		'o' : rest,
 	}
 
-	def generateMidiFromMarkup(self, rudiment_pattern):
-		print "RUDIMENT: %s" % rudiment_pattern
-		self.rudiment_pattern = rudiment_pattern
-		self.timing = 4
+	def generateBar(self, rudiment_pattern):
 
 		for unit in rudiment_pattern:
+
+			print "unit: %s" % unit
 
 			if unit == "f":
 				print "prepare for flam"
 				self.flam = True   # skip this unit, but note for a flam for next one
+			elif unit.isdigit():
+				self.time(int(unit))
 			else:
 				self.rudiparse[unit](self)
+
+	def generateMidiFromMarkup(self, rudiment_pattern):
+		
+		print "RUDIMENT: %s" % rudiment_pattern
+		self.rudiment_pattern = rudiment_pattern
+		self.timing = 4
+
+		for bar in range(0,args.bars):
+			self.generateBar(rudiment_pattern)
 
 		self.endOfTrack()
 		self.saveTrack()
 
 
 	def endOfTrack(self):
+
 		# Add the end of track event, append it to the track
 		eot = midi.EndOfTrackEvent(tick=1)
 		self.track.append(eot)
@@ -239,8 +254,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("rudiment_pattern", help="a rudiment markup pattern to parse")
 parser.add_argument("bpm", help="the bpm you wish to generate at", type=int)
 parser.add_argument("output", help="the name of the output midi file")
-parser.add_argument("-t", "--note_tightness", help="define the length of the midi notes (should relate to difficulty to hit in FE", type=int, default=10)
-#parser.add_argument("bars", help="the number of bars of pattern to generate", type=int)
+parser.add_argument("-t", "--note_tightness", help="define the length of the midi notes (should relate to difficulty to hit in FE", type=int, default=64)
+parser.add_argument("-b", "--bars", help="the number of bars of pattern to generate", type=int)
 #parser.add_argument("rudiment", help="the name of the rudiment to generate")
 parser.add_argument("-r", "--reverse_sticking", help="reverse the sticking",
                     action="store_true")
