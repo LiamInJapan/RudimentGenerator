@@ -35,7 +35,8 @@ Install:
 $ brew install timidity
 
 Test with:
-timidity example.mid
+timidity example.mid -D 0
 
+(generator.py automatically outputs to channel 0 and the above -D 0 sets the drum channel to 0, hence you will hear drums if you do this)
 
 

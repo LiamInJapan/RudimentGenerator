@@ -13,7 +13,31 @@
 # fix flam
 # implement rest
 # add difficult factor (for note length)... Should probably also calculate relative to tempo, or at least do some error checking against tempo so no overlaps
+# program accents in properly
 
+
+'''
+
+Timidity potentiall useful flags:
+
+-D n, --drum-channel=n
+              Marks channel as a drum channel.  If channel is negative, channel -n is marked as an instrumental channel.  If n is 0, all channels  are  marked  as
+              instrumental.
+
+
+dir:directory
+       directory/
+              Read and play all MIDI files in the specified directory.  For example,
+
+              % timidity some/where/
+
+              plays all files in the directory some/where/.
+
+-c file, --config-file=file
+              Reads an extra configuration file.
+
+
+'''
 '''
 
 Spec for rudiment markup
@@ -82,25 +106,26 @@ class RudimentGenerator:
 
 	rudiments = {
 		'single_stroke_roll' : "4rlrlrlrl",
-	    'single_stroke_four' : "3rlrloorlrloo",
-	    'single_stroke_seven' : "6rlrlrlrooo",
+	    'single_stroke_four' : "6rlrloorlrloo",
+	    'single_stroke_seven' : "6rlrlrlroo",
 	    'multiple_bounce_roll' : "????",   # need to think about how to implement bounces e.t.c. with real pad
 	    'double_stroke_roll' : "4rrllrrll",
-	    'triple_stroke_roll' : "3rrrlllrrrlll",
+	    'triple_stroke_roll' : "6rrrlllrrrlll",
 	    'five_stroke_roll' : "4rrrrRooollllLooo",
-	    'five_stroke_roll_triplet' : "3rrllrooollrrlooo",
-	    'six_stroke_roll' : "6RrrrrLRrrrrL",
-	    'seven_stroke_roll' : "llllllll",
-	    'nine_stroke_roll' : "llllllll",
-	    'ten_stroke_roll' : "llllllll",
-	    'eleven_stroke_roll' : "llllllll",
-	    'thirteen_stroke_roll' : "llllllll",
-	    'fifteen_stroke_roll' : "llllllll",
-	    'seventeen_stroke_roll' : "llllllll",
-	    'single_paradiddle' : "llllllll",
-	    'double_paradiddle' : "llllllll",
-	    'triple_paradiddle' : "llllllll",
-	    'single_paradiddle_diddle' : "llllllll",
+	    'five_stroke_roll_triplet' : "6rrllrooollrrlooo",
+	    'six_stroke_roll' : "6RoollrrLooRoollrrLoo",  # tweak, check http://vicfirth.com/six-stroke-roll/
+	    'seven_stroke_roll' : "6rrllrrLoo",
+	    'seven_stroke_roll_triplet' : "6rrllrrLooooo",
+	    'nine_stroke_roll' : "6rrllrrllRooo",
+	    'ten_stroke_roll' : "6RooolrlrlrlrLooo",  # seems very wrong...
+	    'eleven_stroke_roll' : "6rrllrrllrrLooo", 
+	    'thirteen_stroke_roll' : "6rrllrrllrrllRooo",
+	    'fifteen_stroke_roll' : "6rrllrrllrrllrrRooo",
+	    'seventeen_stroke_roll' : "6rrllrrllrrllrrLooo",
+	    'single_paradiddle' : "RlrrLrll",
+	    'double_paradiddle' : "RlrlrrLrlrll",
+	    'triple_paradiddle' : "RlrlrlrrLrlrlrll",
+	    'single_paradiddle_diddle' : "RlrrllRlrrll",
 	    'flam' : "llllllll",
 	    'flam_tap' : "llllllll",
 	    'flam_accent' : "llllllll",
@@ -129,6 +154,7 @@ class RudimentGenerator:
 		self.pattern = midi.Pattern()
 		self.track = midi.Track()
 		self.flam = False
+		self.accent = False
 		self.rest_beats = 1
 		self.pattern.append(self.track)
 		self.note_tightness = args.note_tightness
@@ -160,7 +186,15 @@ class RudimentGenerator:
 			print "before - rest: %d rest_beats: %d" % (self.rest, self.rest_beats)
 			self.rest *= self.rest_beats
 			print "after - rest: %d rest_beats: %d" % (self.rest, self.rest_beats)
-			on = midi.NoteOnEvent(tick = self.rest, velocity=60, pitch = note)
+			
+			velocity = 60
+
+			if self.accent == True:
+				velocity = 120
+
+			self.accent = False
+
+			on = midi.NoteOnEvent(tick = self.rest, velocity=velocity, pitch = note)
 			self.track.append(on)
 			off = midi.NoteOffEvent(tick = self.note_tightness, pitch = note)
 			self.track.append(off)
@@ -178,10 +212,12 @@ class RudimentGenerator:
 
 	def left_stick_accent(self):
 		print "left accent"
+		self.accent = True
 		self.write_note(self.new_sticking["L"])
 
 	def right_stick_accent(self):
 		print "right accent"
+		self.accent = True
 		self.write_note(self.new_sticking["R"])
 
 	def time(self, new_time):
@@ -193,10 +229,10 @@ class RudimentGenerator:
 		self.rest_beats += 1
 
 	new_sticking = {
-		"l" : midi.G_3,
-		"r" : midi.G_3+1,
-		"L" : midi.G_3+2,
-		"R" : midi.G_3+3,
+		"l" : 38,
+		"r" : 40,
+		"L" : 38,
+		"R" : 40,
 	}
 
 	rudiparse = {
