@@ -68,6 +68,8 @@ And so on
 
 import midi
 import argparse
+import subprocess
+
 
 class RudimentGenerator:
 
@@ -108,7 +110,7 @@ class RudimentGenerator:
 		'single_stroke_roll' : "4rlrlrlrl",
 	    'single_stroke_four' : "6rlrloorlrloo",
 	    'single_stroke_seven' : "6rlrlrlroo",
-	    'multiple_bounce_roll' : "????",   # need to think about how to implement bounces e.t.c. with real pad
+	    'multiple_bounce_roll' : "llllllll",   # need to think about how to implement bounces e.t.c. with real pad
 	    'double_stroke_roll' : "4rrllrrll",
 	    'triple_stroke_roll' : "6rrrlllrrrlll",
 	    'five_stroke_roll' : "4rrrrRooollllLooo",
@@ -126,7 +128,7 @@ class RudimentGenerator:
 	    'double_paradiddle' : "RlrlrrLrlrll",
 	    'triple_paradiddle' : "RlrlrlrrLrlrlrll",
 	    'single_paradiddle_diddle' : "RlrrllRlrrll",
-	    'flam' : "llllllll",
+	    'flam' : "flooooooofroooooo",
 	    'flam_tap' : "llllllll",
 	    'flam_accent' : "llllllll",
 	    'flamacue' : "llllllll",
@@ -156,6 +158,7 @@ class RudimentGenerator:
 		self.flam = False
 		self.accent = False
 		self.rest_beats = 1
+		self.outputFile = args.output
 		self.pattern.append(self.track)
 		self.note_tightness = args.note_tightness
 		self.rest = self.one_beat_value/self.beat_values_new["1/4"][1]
@@ -261,14 +264,18 @@ class RudimentGenerator:
 	def generateMidiFromMarkup(self, rudiment_pattern):
 		
 		print "RUDIMENT: %s" % rudiment_pattern
-		self.rudiment_pattern = rudiment_pattern
-		self.timing = 4
 
-		for bar in range(0,args.bars):
-			self.generateBar(rudiment_pattern)
+		if rudiment_pattern == "all":
+			self.generateAllMidis()
+		else:
+			self.rudiment_pattern = rudiment_pattern
+			self.timing = 4
 
-		self.endOfTrack()
-		self.saveTrack()
+			for bar in range(0,args.bars):
+				self.generateBar(rudiment_pattern)
+
+			self.endOfTrack()
+			self.saveTrack()
 
 
 	def endOfTrack(self):
@@ -281,7 +288,12 @@ class RudimentGenerator:
 	
 	def saveTrack(self):
 		# Save the pattern to disk
-		midi.write_midifile(args.output, self.pattern)
+		midi.write_midifile(self.outputFile, self.pattern)
+
+	def generateAllMidis(self):
+		for key, value in self.rudiments.iteritems():
+			self.outputFile = "./midis/%s.midi" % key
+			self.generateMidiFromMarkup(value)
 
 
 
@@ -308,6 +320,6 @@ else:
 args = parser.parse_args()
 rg.generateMidiFromMarkup(args.rudiment_pattern)
 
-
+#subprocess.Popen("echo __test__")
 
 
