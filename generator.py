@@ -1,8 +1,6 @@
 # TODO
-# Map to left/right drum stickings
-# Get some basic rudiment patterns in
 # Work out how to reverse rudiments
-# Get all rudiment patterns in
+# Finish all rudiment patterns
 # work out how to do flam roll
 # work out how to do buzz roll notes
 # work out how to pipe into game front end

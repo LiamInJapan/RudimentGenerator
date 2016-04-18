@@ -1,0 +1,17 @@
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/UnityEngine.dll
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/UnityEditor.dll
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/UnityEngine.UI.dll
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/UnityEngine.Networking.dll
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/Mono.Cecil.dll
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/Unity.SerializationLogic.dll
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/Unity.DataContract.dll
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/ICSharpCode.NRefactory.dll
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/Unity.UNetWeaver.dll
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/Unity.UNetWeaver.dll.mdb
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/Unity.CecilTools.dll
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/Mono.Cecil.Pdb.dll
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/Mono.Cecil.Mdb.dll
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/Assembly-CSharp.dll.mdb
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/Temp/bin/Debug/Assembly-CSharp.dll
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/obj/Debug/Assembly-CSharp.dll
+/Users/liam/Development/RudimentGenerator/Unity/RudimentTrainer/obj/Debug/Assembly-CSharp.dll.mdb
