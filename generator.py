@@ -1,6 +1,6 @@
 # TODO
 # Work out how to reverse rudiments
-# Finish all rudiment patterns
+# Finish all easy rudiment patterns (e.g. ones without rolls)
 # program accents in properly
 # work out how to install dependencies  (https://pip.readthedocs.org/en/stable/user_guide/#requirements-files)
 # work out how to do flam roll
