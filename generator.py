@@ -71,22 +71,7 @@ import subprocess
 
 class RudimentGenerator:
 
-	beat_values = {
-		"1"   : 128,
-		"1/2" : 128/2,
-		"1/4" : 128/4,
-		"1/4t" : ((128/4)*4)/3,
-		"1/8" : 128/8,
-		"1/8t" : ((128/4)*4)/9,
-		"1/16" : 128/16,
-		"1/16t" : ((128/4)*4)/27,
-		"1/32" : 128/32,
-		"1/4t" : ((128/4)*4)/81,
-		"1/64" : 128/64,
-		"1/4t" : ((128/4)*4)/243,
-	}
-
-	one_beat_value = 256
+	one_beat_value = 30
 
 	beat_values_new = {
 		"1"     : (1,1),
@@ -106,7 +91,7 @@ class RudimentGenerator:
 
 	rudiments = {
 		'single_stroke_roll' : "4rlrlrlrl",
-	    'single_stroke_four' : "6rlrloorlrloo",
+	    'single_stroke_four' : "3rlrloorlrloo",
 	    'single_stroke_seven' : "6rlrlrlroo",
 	    'multiple_bounce_roll' : "llllllll",   # need to think about how to implement bounces e.t.c. with real pad
 	    'double_stroke_roll' : "4rrllrrll",
@@ -181,6 +166,8 @@ class RudimentGenerator:
 		self.rest_beats = 1
 
 	def write_note(self, note):
+		print "NOTE:"
+		print note
 		if self.flam == True:
 			self.write_flam_note(note)
 		else:
@@ -195,11 +182,15 @@ class RudimentGenerator:
 
 			self.accent = False
 
+			# this is where the core of the timing stuff is going on it seems...
 			on = midi.NoteOnEvent(tick = self.rest, velocity=velocity, pitch = note)
+			print "midi on event generated at %d" % self.rest
 			self.track.append(on)
 			off = midi.NoteOffEvent(tick = self.note_tightness, pitch = note)
 			self.track.append(off)
 			self.rest = self.one_beat_value/self.beat_values_new["1/%d" % self.timing][1]
+			print "self.rest"
+			print self.rest
 			self.rest_beats = 1
 		
 
@@ -247,7 +238,9 @@ class RudimentGenerator:
 
 	def generateBar(self, rudiment_pattern):
 
-		for unit in rudiment_pattern:
+		print self.rudiments[rudiment_pattern]
+
+		for unit in self.rudiments[rudiment_pattern]:
 
 			print "unit: %s" % unit
 
@@ -300,7 +293,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("rudiment_pattern", help="a rudiment markup pattern to parse")
 parser.add_argument("bpm", help="the bpm you wish to generate at", type=int)
 parser.add_argument("output", help="the name of the output midi file")
-parser.add_argument("-t", "--note_tightness", help="define the length of the midi notes (should relate to difficulty to hit in FE", type=int, default=64)
+parser.add_argument("-t", "--note_tightness", help="define the length of the midi notes (should relate to difficulty to hit in FE", type=int, default=30)
 parser.add_argument("-b", "--bars", help="the number of bars of pattern to generate", type=int)
 #parser.add_argument("rudiment", help="the name of the rudiment to generate")
 parser.add_argument("-r", "--reverse_sticking", help="reverse the sticking",
