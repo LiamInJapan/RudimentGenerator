@@ -3,7 +3,7 @@ import midi
 
 class RudimentGenerator:
 
-	one_beat_value = 120
+	one_beat_value = 1
 	base_time = 4
 	delta_time = 0
 
@@ -18,6 +18,9 @@ class RudimentGenerator:
 		self.note_tightness = args.note_tightness
 		tempo = midi.SetTempoEvent()
 		tempo.set_bpm(args.bpm)
+		#tempo.set_bpm(130)
+		print "mpqn: %d" % tempo.get_mpqn()
+		self.one_beat_value = args.bpm
 		self.track.append(tempo)
 
 
@@ -47,7 +50,7 @@ class RudimentGenerator:
 		"l" : 38,
 		"r" : 40,
 		"L" : 38,
-		"R" : 40,
+		"R" : 40#31,
 	}
 	def left_stick(self):
 		print "left"
@@ -77,14 +80,14 @@ class RudimentGenerator:
 		print "Swap to four time"
 
 	def rest(self):
-		self.delta_time += self.one_beat_value
+		self.moveOn()
 		print "rest"
 
 	def flam(self):
 		print "flam it up"
 
 	rudiments = {
-		'single_stroke_roll' : "4rlrlrloo",
+		'single_stroke_roll' : "4Rlrlrlrl",
 	    'single_stroke_four' : "3rlrloorlrloo",
 	}
 
@@ -113,14 +116,16 @@ class RudimentGenerator:
 		print "this is where we should write a note... but where?"
 		print self.delta_time
 		velocity = 60
-		on = midi.NoteOnEvent(tick = self.delta_time, velocity=velocity, pitch = note)
+		on = midi.NoteOnEvent(tick = 0, velocity=velocity, pitch = note)
 		self.track.append(on)
 		off = midi.NoteOffEvent(tick = self.note_tightness, pitch = note)
 		self.track.append(off)
+		self.delta_time = 0
 
 	def moveOn(self):
 		print "advance time"
-		self.delta_time = self.one_beat_value
+		self.delta_time += self.one_beat_value - self.note_tightness
+		print "self.delta_time: % d" % self.delta_time 
 
 				
 
@@ -129,7 +134,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("rudiment_pattern", help="a rudiment markup pattern to parse")
 parser.add_argument("bpm", help="the bpm you wish to generate at", type=int)
 parser.add_argument("output", help="the name of the output midi file")
-parser.add_argument("-t", "--note_tightness", help="define the length of the midi notes (should relate to difficulty to hit in FE", type=int, default=30)
+parser.add_argument("-t", "--note_tightness", help="define the length of the midi notes (should relate to difficulty to hit in FE", type=int, default=120)
 parser.add_argument("-b", "--bars", help="the number of bars of pattern to generate", type=int)
 #parser.add_argument("rudiment", help="the name of the rudiment to generate")
 parser.add_argument("-r", "--reverse_sticking", help="reverse the sticking",
