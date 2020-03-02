@@ -71,7 +71,7 @@ import subprocess
 
 class RudimentGenerator:
 
-	one_beat_value = 30
+	one_beat_value = 120
 
 	beat_values_new = {
 		"1"     : (1,1),

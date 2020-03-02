@@ -1,28 +1,26 @@
 import argparse
-import midi
+#import midi
+from midiutil import MIDIFile
 
 class RudimentGenerator:
 
-	one_beat_value = 1
-	base_time = 4
-	delta_time = 0
+	note_value = 0.3333333333333333
 
 	def __init__(self):
 		
 		print "BPM: %d" % args.bpm
 		print "Rudiment Pattern: %s" % args.rudiment_pattern
-		self.pattern = midi.Pattern()
-		self.track = midi.Track()
-		self.outputFile = args.output
-		self.pattern.append(self.track)
-		self.note_tightness = args.note_tightness
-		tempo = midi.SetTempoEvent()
-		tempo.set_bpm(args.bpm)
-		#tempo.set_bpm(130)
-		print "mpqn: %d" % tempo.get_mpqn()
-		self.one_beat_value = args.bpm
-		self.track.append(tempo)
+		
+		self.track = 0
+		self.channel = 0
+		self.time = 0
+		self.duration = args.note_tightness
+		self.tempo = args.bpm # this libr seems to work except for one reason, everything seems to be half the speed it should be
 
+		self.MyMIDI = MIDIFile(1)
+		self.MyMIDI.addTempo(self.track, self.time, self.tempo)
+
+		self.outputFile = args.output
 
 	def generateMidiFromMarkup(self, rudiment_pattern):
 		
@@ -31,50 +29,46 @@ class RudimentGenerator:
 		for bar in range(0, args.bars):
 			self.generateBar(rudiment_pattern)
 
-		self.endOfTrack()
+		#self.endOfTrack()
 		self.saveTrack()
 	
-	def endOfTrack(self):
+	#def endOfTrack(self):
 
 		# Add the end of track event, append it to the track
-		eot = midi.EndOfTrackEvent(tick=1)
-		self.track.append(eot)
+		# eot = midi.EndOfTrackEvent(tick=1)
+		# self.track.append(eot)
 		# Print out the pattern
-		print self.pattern
+		#print self.pattern
 	
 	def saveTrack(self):
 		# Save the pattern to disk
-		midi.write_midifile(self.outputFile, self.pattern)
+		with open(self.outputFile, "wb") as output_file:
+			self.MyMIDI.writeFile(output_file)
 
 	sticking = {
 		"l" : 38,
 		"r" : 40,
-		"L" : 38,
-		"R" : 40#31,
+		"L" : 30,
+		"R" : 31,
 	}
 	def left_stick(self):
 		print "left"
 		self.writeNote(self.sticking["l"])
-		self.moveOn()
 
 	def right_stick(self):
 		print "right"
 		self.writeNote(self.sticking["r"])
-		self.moveOn()
 
 	def left_stick_accent(self):
 		print "left accent"
 		self.writeNote(self.sticking["L"])
-		self.moveOn()
 
 	def right_stick_accent(self):
 		print "right accent"
 		self.writeNote(self.sticking["R"])
-		self.moveOn()
 
 	def threeTime(self):
 		print "Swap to three time"
-		#self.base_time = new_time
 
 	def fourTime(self):
 		print "Swap to four time"
@@ -89,6 +83,7 @@ class RudimentGenerator:
 	rudiments = {
 		'single_stroke_roll' : "4Rlrlrlrl",
 	    'single_stroke_four' : "3rlrloorlrloo",
+	    'liam' : "4RRLLrroo"
 	}
 
 	rudiparse = {
@@ -113,19 +108,14 @@ class RudimentGenerator:
 				self.rudiparse[unit](self)
 
 	def writeNote(self, note):
-		print "this is where we should write a note... but where?"
-		print self.delta_time
 		velocity = 60
-		on = midi.NoteOnEvent(tick = 0, velocity=velocity, pitch = note)
-		self.track.append(on)
-		off = midi.NoteOffEvent(tick = self.note_tightness, pitch = note)
-		self.track.append(off)
-		self.delta_time = 0
+
+		self.MyMIDI.addNote(self.track, self.channel, note, self.time, self.duration, velocity)
+		self.time = self.time + self.note_value
 
 	def moveOn(self):
-		print "advance time"
-		self.delta_time += self.one_beat_value - self.note_tightness
-		print "self.delta_time: % d" % self.delta_time 
+		print(self.time)
+		self.time = self.time + self.note_value
 
 				
 
