@@ -5,10 +5,7 @@ from midiutil import MIDIFile
 class RudimentGenerator:
 
 	note_value = 1
-	double = False
-	flam = False
-	drag = False
-	flam_gap = 0.00390625
+	flam_gap = 0.0078125*4  # we might need to add an adjustment factor based on the time amount
 	drag_gap = 0.0078125
 
 	def __init__(self):
@@ -218,17 +215,6 @@ class RudimentGenerator:
 		self.moveOn()
 		print "rest"
 
-	def flam(self):
-		print "FLAM ON"
-		self.flam = True
-
-	def drag(self):
-		self.drag = True
-
-	def double(self):
-		self.double = True
-
-
 	rudiments = {
 		'single_stroke_roll' : "2rlrlrlrl",
 	    'single_stroke_four' : "3rlrloorlrloo",
@@ -254,8 +240,8 @@ class RudimentGenerator:
 	    'drag' : "4DloooDrooo", 
 	    'flam_tap' : "2DRrDLlDRrDLl", # somethings weird here
 	    'flam_accent' : "3DRlrDLrl", # somethings weird here
-	    'flamacue' : "2frLrlfrooo",
-	    'flam_paradiddle' : "llllllll",
+	    'flamacue' : "4frLrlfrooo",
+	    'flam_paradiddle' : "4fRlrrfLrll",
 	    'single_flammed_mill' : "llllllll",
 	    'flam_paradiddle_diddle' : "llllllll",
 	    'swiss_army_triplet' : "llllllll",
@@ -273,6 +259,14 @@ class RudimentGenerator:
 	    'triple_ratamacue' : "llllllll",
 	}
 
+	timing_change = {
+		'1' : oneTime,
+		'2' : twoTime,
+		'3' : threeTime,
+		'4' : fourTime,
+		'6' : sixTime
+	}
+
 	rudiparse = {
 
 		'l' : left_stick,
@@ -280,14 +274,6 @@ class RudimentGenerator:
 		'L' : left_stick_accent,
 		'R' : right_stick_accent,
 		'o' : rest,
-		'1' : oneTime,
-		'2' : twoTime,
-		'3' : threeTime,
-		'4' : fourTime,
-		'6' : sixTime,
-		'f' : flam,
-		'D' : drag,
-		'd' : double
 	}
 
 	rudiparse_flams = {
@@ -314,18 +300,25 @@ class RudimentGenerator:
 	def generateBar(self, rudiment_pattern):
 		print "generate bar of %s" % rudiment_pattern
 
-		for unit in self.rudiments[rudiment_pattern]:
-			if self.flam == True:
-				self.rudiparse_flams[unit](self) 
-				self.flam = False
-			elif self.drag == True:
-				self.rudiparse_drags[unit](self)
+		rudi_iter = iter(self.rudiments[rudiment_pattern])
+
+		for unit in rudi_iter:
+			if unit.isdigit():
+				self.timing_change[unit](self)
+			elif unit == 'f':
+				test = next(rudi_iter, None)
+				self.rudiparse_flams[test](self)
 				self.moveOn()
-				self.drag = False
-			elif self.double == True:
-				self.rudiparse_doubles[unit](self)
+			elif unit == 'D':
+				test = next(rudi_iter, None)
+				self.rudiparse_drags[test](self)
 				self.moveOn()
-				self.double = False
+			elif unit == 'd':
+				test = next(rudi_iter, None)
+				self.rudiparse_doubles[test](self)
+				self.moveOn()
+			elif unit == 'o':
+				self.moveOn()
 			else:
 				print "NORMAL HIT: %s" % unit
 				self.rudiparse[unit](self)
