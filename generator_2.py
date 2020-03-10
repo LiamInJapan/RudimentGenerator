@@ -242,12 +242,12 @@ class RudimentGenerator:
 	    'flam_accent' : "3DRlrDLrl", # somethings weird here
 	    'flamacue' : "4frLrlfrooo",
 	    'flam_paradiddle' : "4fRlrrfLrll",
-	    'single_flammed_mill' : "llllllll",
-	    'flam_paradiddle_diddle' : "llllllll",
-	    'swiss_army_triplet' : "llllllll",
-	    'inverted_flam_tap' : "llllllll",
-	    'flam_drag' : "llllllll",
-	    'pataflafla' : "llllllll",
+	    'single_flammed_mill' : "4fRrlrfLlrl",
+	    'flam_paradiddle_diddle' : "4fRlrrllfLrllrr",
+	    'swiss_army_triplet' : "3fRrlfRrl",
+	    'inverted_flam_tap' : "4fRlfLrfRlfLr",
+	    'flam_drag' : "3fRdlrfLdrl", # STOP HERE - The doubles have stopped working properly so debug
+	    'pataflafla' : "llllllll", # CONTINUE
 	    'drag_ruff' : "llllllll",
 	    'single_drag_tap' : "llllllll",
 	    'double_drag_tap' : "llllllll",
