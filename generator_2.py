@@ -37,6 +37,12 @@ class RudimentGenerator:
 				self.outputFile = "./midis/%s@%s.midi" % (key, bpm)
 				self.generateMidiFromMarkup(key)
 
+	def generateStartBeat(self):
+		self.rest()
+		self.rest()
+		self.rest()
+		self.rest()
+
 	def initTrack(self):
 		
 		print "BPM: %d" % args.bpm
@@ -50,6 +56,8 @@ class RudimentGenerator:
 
 		self.MyMIDI = MIDIFile(1)
 		self.MyMIDI.addTempo(self.track, self.time, self.tempo)
+
+		self.generateStartBeat()
 
 		self.outputFile = args.output
 
@@ -112,18 +120,36 @@ class RudimentGenerator:
 		previousNoteValue = self.note_value
 		self.note_value = self.flam_gap
 		self.time = self.time - self.note_value
-		self.writeNote(self.sticking["l"], 32)
+		self.writeNote(self.sticking["r"], 32)
 		self.time = self.time + self.note_value
 		self.writeNote(self.sticking["l"], 60)
+		self.note_value = previousNoteValue
+
+	def left_flam_accent(self):
+		previousNoteValue = self.note_value
+		self.note_value = self.flam_gap
+		self.time = self.time - self.note_value
+		self.writeNote(self.sticking["R"], 32)
+		self.time = self.time + self.note_value
+		self.writeNote(self.sticking["L"], 127)
 		self.note_value = previousNoteValue
 
 	def right_flam(self):
 		previousNoteValue = self.note_value
 		self.note_value = self.flam_gap
 		self.time = self.time - self.note_value
-		self.writeNote(self.sticking["r"], 32)
+		self.writeNote(self.sticking["l"], 32)
 		self.time = self.time + self.note_value
 		self.writeNote(self.sticking["r"], 60)
+		self.note_value = previousNoteValue
+
+	def right_flam_accent(self):
+		previousNoteValue = self.note_value
+		self.note_value = self.flam_gap
+		self.time = self.time - self.note_value
+		self.writeNote(self.sticking["L"], 32)
+		self.time = self.time + self.note_value
+		self.writeNote(self.sticking["R"], 127)
 		self.note_value = previousNoteValue
 
 	def left_drag(self):
@@ -134,10 +160,10 @@ class RudimentGenerator:
 		self.time = self.time + self.note_value
 		self.writeNote(self.sticking["r"], 32)
 		self.time = self.time + self.note_value
-		self.writeNote(self.sticking["r"], 60)
+		self.writeNote(self.sticking["l"], 60)
 		self.note_value = previousNoteValue
 
-	def right_drag(self):
+	def left_drag_accent(self):
 		previousNoteValue = self.note_value
 		self.note_value = self.drag_gap * 2
 		self.time = self.time - (self.note_value * 2)
@@ -145,7 +171,29 @@ class RudimentGenerator:
 		self.time = self.time + self.note_value
 		self.writeNote(self.sticking["r"], 32)
 		self.time = self.time + self.note_value
+		self.writeNote(self.sticking["L"], 127)
+		self.note_value = previousNoteValue
+
+	def right_drag(self):
+		previousNoteValue = self.note_value
+		self.note_value = self.drag_gap * 2
+		self.time = self.time - (self.note_value * 2)
+		self.writeNote(self.sticking["l"], 32)
+		self.time = self.time + self.note_value
+		self.writeNote(self.sticking["l"], 32)
+		self.time = self.time + self.note_value
 		self.writeNote(self.sticking["r"], 60)
+		self.note_value = previousNoteValue
+
+	def right_drag_accent(self):
+		previousNoteValue = self.note_value
+		self.note_value = self.drag_gap * 2
+		self.time = self.time - (self.note_value * 2)
+		self.writeNote(self.sticking["L"], 32)
+		self.time = self.time + self.note_value
+		self.writeNote(self.sticking["L"], 32)
+		self.time = self.time + self.note_value
+		self.writeNote(self.sticking["R"], 127)
 		self.note_value = previousNoteValue
 
 
@@ -171,6 +219,7 @@ class RudimentGenerator:
 		print "rest"
 
 	def flam(self):
+		print "FLAM ON"
 		self.flam = True
 
 	def drag(self):
@@ -203,9 +252,9 @@ class RudimentGenerator:
 	    'single_paradiddle_diddle' : "4RlrrllRlrrll",
 	    'flam' : "4flooofrooo", 
 	    'drag' : "4DloooDrooo", 
-	    'flam_tap' : "llllllll",
-	    'flam_accent' : "llllllll",
-	    'flamacue' : "llllllll",
+	    'flam_tap' : "2DRrDLlDRrDLl", # somethings weird here
+	    'flam_accent' : "3DRlrDLrl", # somethings weird here
+	    'flamacue' : "2frLrlfrooo",
 	    'flam_paradiddle' : "llllllll",
 	    'single_flammed_mill' : "llllllll",
 	    'flam_paradiddle_diddle' : "llllllll",
@@ -243,12 +292,16 @@ class RudimentGenerator:
 
 	rudiparse_flams = {
 		'l' : left_flam,
-		'r' : right_flam
+		'r' : right_flam,
+		'L' : left_flam_accent,
+		'R' : right_flam_accent
 	}
 
 	rudiparse_drags = {
 		'l' : left_drag,
-		'r' : right_drag
+		'r' : right_drag,
+		'L' : right_drag_accent,
+		'R' : right_drag_accent
 	}
 
 	rudiparse_doubles = {
@@ -263,20 +316,26 @@ class RudimentGenerator:
 
 		for unit in self.rudiments[rudiment_pattern]:
 			if self.flam == True:
-				self.rudiparse_flams[unit](self)
+				self.rudiparse_flams[unit](self) 
 				self.flam = False
 			elif self.drag == True:
 				self.rudiparse_drags[unit](self)
+				self.moveOn()
 				self.drag = False
 			elif self.double == True:
 				self.rudiparse_doubles[unit](self)
+				self.moveOn()
 				self.double = False
 			else:
+				print "NORMAL HIT: %s" % unit
 				self.rudiparse[unit](self)
+				self.moveOn()
+				print "NORMAL HIT OFF: %s" % unit
+
 
 	def writeNote(self, note, velocity):
+		print(self.time)
 		self.MyMIDI.addNote(self.track, self.channel, note, self.time, self.duration, velocity)
-		self.time = self.time + self.note_value
 
 	def moveOn(self):
 		print(self.time)
