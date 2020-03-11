@@ -6,7 +6,7 @@ class RudimentGenerator:
 
 	note_value = 1
 	flam_gap = 0.0078125*4  # we might need to add an adjustment factor based on the time amount
-	drag_gap = 0.0078125
+	drag_gap = 0.0078125*2
 
 	def __init__(self):
 		print "INIT"
@@ -90,28 +90,28 @@ class RudimentGenerator:
 		self.writeNote(self.sticking["R"], 100)
 
 	def left_stick_double(self):
-		self.note_value = self.note_value * 0.5
 		self.writeNote(self.sticking["l"], 60)
+		self.time = self.time + (self.note_value * 0.5)
 		self.writeNote(self.sticking["l"], 60)
-		self.note_value = self.note_value * 2.0
+		self.time = self.time + (self.note_value * 0.5)
 
 	def right_stick_double(self):
-		self.note_value = self.note_value * 0.5
 		self.writeNote(self.sticking["r"], 60)
+		self.time = self.time + (self.note_value * 0.5)
 		self.writeNote(self.sticking["r"], 60)
-		self.note_value = self.note_value * 2.0
+		self.time = self.time + (self.note_value * 0.5)
 
 	def left_stick_accent_double(self):
-		self.note_value = self.note_value * 0.5
 		self.writeNote(self.sticking["L"], 100)
+		self.time = self.time + (self.note_value * 0.5)
 		self.writeNote(self.sticking["L"], 100)
-		self.note_value = self.note_value * 2.0
+		self.time = self.time + (self.note_value * 0.5)
 
 	def right_stick_accent_double(self):
-		self.note_value = self.note_value * 0.5
 		self.writeNote(self.sticking["R"], 100)
+		self.time = self.time + (self.note_value * 0.5)
 		self.writeNote(self.sticking["R"], 100)
-		self.note_value = self.note_value * 2.0
+		self.time = self.time + (self.note_value * 0.5)
 
 	def left_flam(self):
 		previousNoteValue = self.note_value
@@ -246,17 +246,21 @@ class RudimentGenerator:
 	    'flam_paradiddle_diddle' : "4fRlrrllfLrllrr",
 	    'swiss_army_triplet' : "3fRrlfRrl",
 	    'inverted_flam_tap' : "4fRlfLrfRlfLr",
-	    'flam_drag' : "3fRdlrfLdrl", # STOP HERE - The doubles have stopped working properly so debug
-	    'pataflafla' : "llllllll", # CONTINUE
-	    'drag_ruff' : "llllllll",
-	    'single_drag_tap' : "llllllll",
-	    'double_drag_tap' : "llllllll",
-	    'single_dragadiddle' : "llllllll",
-	    'dragadiddle_1' : "llllllll",
-	    'dragadiddle_2' : "llllllll",
-	    'single_ratamacue' : "llllllll",
-	    'double_ratamacue' : "llllllll",
-	    'triple_ratamacue' : "llllllll",
+	    'flam_drag' : "2fRdlrfLdrl", 
+	    'pataflafla' : "4fRlrfLfRlrfL", 
+	    'drag_ruff' : "2DrDl",
+	    'single_drag_tap' : "2DrLDlR",
+	    'double_drag_tap' : "3DrDrLDlDlR",
+	    'single_dragadiddle' : "4DRlrrDLrll",
+	    'dragadiddle_1' : "4RDrlrrLDlrll", # do we need a 5 for this?
+	    'dragadiddle_2' : "4RDrDrlrrLDlDlrll", # something seems a bit weird about these two...
+	    'single_ratamacue' : "3DrlrLDlrlR",
+	    'double_ratamacue' : "3DrDrlrLDlDlrlR",
+	    'triple_ratamacue' : "3DrDrDrlrLDlDlDlrlR", 
+	    # these ratamacues are wrong
+	    # this video makes it easier to understand
+	    # https://www.youtube.com/watch?v=wKLOHfuJ8os
+	    # https://en.wikipedia.org/wiki/Drum_rudiment
 	}
 
 	timing_change = {
@@ -311,12 +315,13 @@ class RudimentGenerator:
 				self.moveOn()
 			elif unit == 'D':
 				test = next(rudi_iter, None)
+				print "DRAG HIT:" + test
 				self.rudiparse_drags[test](self)
 				self.moveOn()
 			elif unit == 'd':
 				test = next(rudi_iter, None)
+				print "DOUBLE HIT:" + test
 				self.rudiparse_doubles[test](self)
-				self.moveOn()
 			elif unit == 'o':
 				self.moveOn()
 			else:
